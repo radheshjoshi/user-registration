@@ -19,13 +19,18 @@ public class UserController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user){
-        UserDto savedUser = userService.createUser(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        try{
+            UserDto savedUser = userService.createUser(user);
+            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        } catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
-    @GetMapping("/home")
+    @GetMapping("/dashboard")
     public String homePage(@RequestParam(value = "username", defaultValue = "User") String username){
         return String.format("Hello %s", username);
     }
