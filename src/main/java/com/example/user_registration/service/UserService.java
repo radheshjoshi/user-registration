@@ -5,8 +5,11 @@ import com.example.user_registration.entity.User;
 import com.example.user_registration.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -28,6 +31,15 @@ public class UserService {
             repository.save(user);
             return createUserDtoFromUser(user);
         } catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public UserDto getUserByUserName(String userName) throws Exception {
+        try {
+            Optional<User> user = repository.findByUsername(userName);
+            return createUserDtoFromUser(user.get());
+        } catch (UsernameNotFoundException e) {
             throw new Exception(e.getMessage());
         }
     }

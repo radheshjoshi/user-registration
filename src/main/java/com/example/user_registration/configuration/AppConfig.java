@@ -16,9 +16,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class AppConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomSuccessHandler customSuccessHandler;
 
-    public AppConfig(CustomUserDetailsService customUserDetailsService) {
+    public AppConfig(CustomUserDetailsService customUserDetailsService, CustomSuccessHandler customSuccessHandler) {
         this.customUserDetailsService = customUserDetailsService;
+        this.customSuccessHandler = customSuccessHandler;
     }
 
     @Bean
@@ -30,9 +32,13 @@ public class AppConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/user/home"))
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
-                .formLogin(Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/user/**").authenticated()
+                        .anyRequest().permitAll())
+                .formLogin(form -> {
+                    form.successHandler(customSuccessHandler);
+                })
+                .logout(Customizer.withDefaults())
                 .build();
     }
 

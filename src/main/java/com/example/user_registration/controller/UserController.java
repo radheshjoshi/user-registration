@@ -5,6 +5,7 @@ import com.example.user_registration.entity.User;
 import com.example.user_registration.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,7 +32,12 @@ public class UserController {
     }
 
     @GetMapping("/dashboard")
-    public String homePage(@RequestParam(value = "username", defaultValue = "User") String username){
-        return String.format("Hello %s", username);
+    public ResponseEntity<?> userDashboard(@RequestParam(value = "username", defaultValue = "User") String username){
+        try {
+            UserDto user = userService.getUserByUserName(username);
+            return new ResponseEntity<>(user, HttpStatus.FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }
